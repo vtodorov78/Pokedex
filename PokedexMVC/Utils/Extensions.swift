@@ -66,14 +66,24 @@ extension Data {
     }
 }
 
+let imageCache = NSCache<NSString, UIImage>()
 extension UIImageView {
     func downloaded(from url: URL, contentMode mode: ContentMode = .scaleAspectFit) {
         contentMode = mode
+        
+        // check cached image
+        if let cachedImage = imageCache.object(forKey: url.absoluteString as NSString) {
+            self.image = cachedImage
+            return
+        }
+        
+        // if not - download image from url
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard
                 let data = data, error == nil,
                 let image = UIImage(data: data)
-                else { return }
+            else { return }
+            imageCache.setObject(image, forKey: url.absoluteString as NSString)
             DispatchQueue.main.async() { [weak self] in
                 self?.image = image
             }

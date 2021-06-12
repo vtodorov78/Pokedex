@@ -10,6 +10,7 @@ import UIKit
 class Pokemon: Codable {
     
     let name: String?
+    let id: Int?
     let imageUrl: String?
     let description: String?
     let height: Int?
