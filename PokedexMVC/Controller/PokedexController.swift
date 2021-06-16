@@ -13,6 +13,10 @@ class PokedexController: UICollectionViewController {
     // MARK: - Properties
 
     var pokemon = [Pokemon]()
+    var filteredPokemon = [Pokemon]()
+    var inSearchMode = false
+    
+    let searchBar = UISearchBar()
     
     lazy var popupView: PokemonPopUpView = {
         let view = PokemonPopUpView()
@@ -36,13 +40,15 @@ class PokedexController: UICollectionViewController {
         
         configureViewComponents()
         fetchPokemon()
+        
     }
     
     
     // MARK: - Selectors
     
     @objc func showSearchBar() {
-        print(123)
+        search(shouldShow: true)
+        searchBar.becomeFirstResponder()
     }
     
     // MARK: - API
@@ -61,13 +67,17 @@ class PokedexController: UICollectionViewController {
     func configureViewComponents() {
         collectionView.backgroundColor = .white
         
+        searchBar.sizeToFit()
+        searchBar.delegate = self
+        
         navigationController?.navigationBar.barTintColor = .mainPink()
         navigationController?.navigationBar.barStyle = .black
         navigationController?.navigationBar.isTranslucent = false
+        navigationController?.navigationBar.tintColor = .white
         
         navigationItem.title = "Pokedex"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(showSearchBar))
-        navigationItem.rightBarButtonItem?.tintColor = .white
+        showSearchBarButton(shouldShow: true)
         
         collectionView.register(PokedexCell.self, forCellWithReuseIdentifier: PokedexCell.reuseIdentifier)
         collectionView.delegate = self
@@ -82,7 +92,25 @@ class PokedexController: UICollectionViewController {
         visualEffectView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleDismissal)))
     }
     
+    
+    func showSearchBarButton(shouldShow: Bool) {
+        if shouldShow {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(showSearchBar))
+            searchBar.showsCancelButton = false
+        } else {
+            navigationItem.rightBarButtonItem = nil
+        }
+    }
+    
+    func search(shouldShow: Bool) {
+        showSearchBarButton(shouldShow: !shouldShow)
+        searchBar.showsCancelButton = shouldShow
+        navigationItem.titleView = shouldShow ? searchBar : nil
+    }
+    
     func handleShowPopUp() {
+        showSearchBarButton(shouldShow: false)
+        navigationItem.rightBarButtonItem?.isEnabled = false
         
         view.addSubview(popupView)
         popupView.center(inView: view)
@@ -102,17 +130,26 @@ class PokedexController: UICollectionViewController {
 extension PokedexController {
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return pokemon.count
+        return inSearchMode ? filteredPokemon.count : pokemon.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PokedexCell.reuseIdentifier, for: indexPath) as! PokedexCell
-        let pokemon = pokemon[indexPath.item]
-        cell.nameLabel.text = pokemon.name?.capitalized
-        cell.imageView.contentMode = .scaleAspectFit
         
-        if let imgUrl = pokemon.imageUrl {
-        cell.imageView.downloaded(from: imgUrl)
+        if inSearchMode {
+            let filteredPokemon = filteredPokemon[indexPath.item]
+            cell.nameLabel.text = filteredPokemon.name?.capitalized
+            
+            if let imgUrl = filteredPokemon.imageUrl {
+                cell.imageView.downloaded(from: imgUrl)
+            }
+        } else {
+            let pokemon = pokemon[indexPath.item]
+            cell.nameLabel.text = pokemon.name?.capitalized
+            
+            if let imgUrl = pokemon.imageUrl {
+                cell.imageView.downloaded(from: imgUrl)
+            }
         }
         return cell
     }
@@ -152,10 +189,29 @@ extension PokedexController: PopUpDelegate {
             self.popupView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
         }) { (_) in
             self.popupView.removeFromSuperview()
+            self.navigationItem.rightBarButtonItem?.isEnabled = true
+            self.showSearchBarButton(shouldShow: true)
         }
+    }
+}
 
+extension PokedexController: UISearchBarDelegate {
+    
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        if searchText == "" || searchBar.text == nil {
+            inSearchMode = false
+            collectionView.reloadData()
+            view.endEditing(true)
+        } else {
+            inSearchMode = true
+            filteredPokemon = pokemon.filter({ $0.name?.range(of: searchText.lowercased()) != nil })
+            collectionView.reloadData()
+        }
     }
     
-    
-    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        search(shouldShow: false)
+    }
 }

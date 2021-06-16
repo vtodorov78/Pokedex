@@ -15,8 +15,8 @@ class PokemonPopUpView: UIView {
 
     // MARK: - Properties
     
-    let imageView: UIImageView = {
-        let imageView = UIImageView()
+    let imageView: CustomUIImageView = {
+        let imageView = CustomUIImageView()
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()

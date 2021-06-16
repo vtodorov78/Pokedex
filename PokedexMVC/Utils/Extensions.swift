@@ -67,9 +67,14 @@ extension Data {
 }
 
 let imageCache = NSCache<NSString, UIImage>()
-extension UIImageView {
+class CustomUIImageView: UIImageView {
+    
+    var imageUrlString: String?
+    
     func downloaded(from url: URL, contentMode mode: ContentMode = .scaleAspectFit) {
         contentMode = mode
+        
+        imageUrlString = url.absoluteString
         
         // check cached image
         if let cachedImage = imageCache.object(forKey: url.absoluteString as NSString) {
@@ -85,7 +90,9 @@ extension UIImageView {
             else { return }
             imageCache.setObject(image, forKey: url.absoluteString as NSString)
             DispatchQueue.main.async() { [weak self] in
-                self?.image = image
+                if self?.imageUrlString == url.absoluteString {
+                    self?.image = image
+                }
             }
         }.resume()
     }

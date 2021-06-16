@@ -13,8 +13,8 @@ class PokedexCell: UICollectionViewCell {
     
     static let reuseIdentifier = "PokedexCell"
     
-    let imageView: UIImageView = {
-        let imageView = UIImageView()
+    let imageView: CustomUIImageView = {
+        let imageView = CustomUIImageView()
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
