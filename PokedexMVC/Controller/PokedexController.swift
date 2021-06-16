@@ -155,15 +155,27 @@ extension PokedexController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let pokemon = pokemon[indexPath.item]
-        handleShowPopUp()
-        popupView.nameLabel.text = pokemon.name?.capitalized
-        if let imgUrl = pokemon.imageUrl {
-        popupView.imageView.downloaded(from: imgUrl)
+        if inSearchMode {
+            let filteredPokemon = filteredPokemon[indexPath.item]
+            handleShowPopUp()
+            popupView.nameLabel.text = filteredPokemon.name?.capitalized
+            if let imgUrl = filteredPokemon.imageUrl {
+                popupView.imageView.downloaded(from: imgUrl)
+            }
+            popupView.typeLabel.text = "Type: \(filteredPokemon.type ?? "N/A")"
+            popupView.heightLabel.text = (String(format: "Height: %d", filteredPokemon.height!))
+            popupView.weightLabel.text = (String(format: "Weight: %d", filteredPokemon.weight!))
+        } else {
+            let pokemon = pokemon[indexPath.item]
+            handleShowPopUp()
+            popupView.nameLabel.text = pokemon.name?.capitalized
+            if let imgUrl = pokemon.imageUrl {
+                popupView.imageView.downloaded(from: imgUrl)
+            }
+            popupView.typeLabel.text = "Type: \(pokemon.type ?? "N/A")"
+            popupView.heightLabel.text = (String(format: "Height: %d", pokemon.height!))
+            popupView.weightLabel.text = (String(format: "Weight: %d", pokemon.weight!))
         }
-        popupView.typeLabel.text = "Type: \(pokemon.type ?? "N/A")"
-        popupView.heightLabel.text = (String(format: "Height: %d", pokemon.height!))
-        popupView.weightLabel.text = (String(format: "Weight: %d", pokemon.weight!))
     }
     
 }
