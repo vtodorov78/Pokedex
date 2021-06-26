@@ -51,6 +51,22 @@ class PokedexController: UICollectionViewController {
         searchBar.becomeFirstResponder()
     }
     
+    @objc func moreInfoButtonClicked() {
+        let infoVC = PokemonInfoController()
+        handleDismissal()
+        
+        if inSearchMode {
+            if let indexPath = collectionView?.indexPathsForSelectedItems?.first {
+                infoVC.pokemon = filteredPokemon[indexPath.row]
+            }
+        } else {
+            if let indexPath = collectionView?.indexPathsForSelectedItems?.first {
+                infoVC.pokemon = pokemon[indexPath.row]
+            }
+        }
+        navigationController?.pushViewController(infoVC, animated: true)
+    }
+    
     // MARK: - API
     
     func fetchPokemon() {
@@ -108,6 +124,8 @@ class PokedexController: UICollectionViewController {
         navigationItem.titleView = shouldShow ? searchBar : nil
     }
     
+    
+    
     func handleShowPopUp() {
         showSearchBarButton(shouldShow: false)
         navigationItem.rightBarButtonItem?.isEnabled = false
@@ -116,6 +134,8 @@ class PokedexController: UICollectionViewController {
         popupView.center(inView: view)
         popupView.heightAnchor.constraint(equalToConstant: view.frame.width + 80).isActive = true
         popupView.widthAnchor.constraint(equalToConstant: view.frame.width - 64).isActive = true
+        
+        popupView.moreInfoButton.addTarget(self, action: #selector(moreInfoButtonClicked), for: .touchUpInside)
         
         popupView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
         popupView.alpha = 0
@@ -126,7 +146,9 @@ class PokedexController: UICollectionViewController {
         }
     }
 }
- 
+
+// MARK: - UICollectionViewDelegate/Datasource
+
 extension PokedexController {
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -138,18 +160,10 @@ extension PokedexController {
         
         if inSearchMode {
             let filteredPokemon = filteredPokemon[indexPath.item]
-            cell.nameLabel.text = filteredPokemon.name?.capitalized
-            
-            if let imgUrl = filteredPokemon.imageUrl {
-                cell.imageView.downloaded(from: imgUrl)
-            }
+            cell.configureCell(with: filteredPokemon)
         } else {
             let pokemon = pokemon[indexPath.item]
-            cell.nameLabel.text = pokemon.name?.capitalized
-            
-            if let imgUrl = pokemon.imageUrl {
-                cell.imageView.downloaded(from: imgUrl)
-            }
+            cell.configureCell(with: pokemon)
         }
         return cell
     }
@@ -158,27 +172,16 @@ extension PokedexController {
         if inSearchMode {
             let filteredPokemon = filteredPokemon[indexPath.item]
             handleShowPopUp()
-            popupView.nameLabel.text = filteredPokemon.name?.capitalized
-            if let imgUrl = filteredPokemon.imageUrl {
-                popupView.imageView.downloaded(from: imgUrl)
-            }
-            popupView.typeLabel.text = "Type: \(filteredPokemon.type ?? "N/A")"
-            popupView.heightLabel.text = (String(format: "Height: %d", filteredPokemon.height!))
-            popupView.weightLabel.text = (String(format: "Weight: %d", filteredPokemon.weight!))
+            popupView.configurePopUp(with: filteredPokemon)
         } else {
             let pokemon = pokemon[indexPath.item]
             handleShowPopUp()
-            popupView.nameLabel.text = pokemon.name?.capitalized
-            if let imgUrl = pokemon.imageUrl {
-                popupView.imageView.downloaded(from: imgUrl)
-            }
-            popupView.typeLabel.text = "Type: \(pokemon.type ?? "N/A")"
-            popupView.heightLabel.text = (String(format: "Height: %d", pokemon.height!))
-            popupView.weightLabel.text = (String(format: "Weight: %d", pokemon.weight!))
+            popupView.configurePopUp(with: pokemon)
         }
     }
-    
 }
+
+// MARK: - UICollectionViewDelegateFlowLayout
 
 extension PokedexController: UICollectionViewDelegateFlowLayout {
     
@@ -191,6 +194,8 @@ extension PokedexController: UICollectionViewDelegateFlowLayout {
         return CGSize(width: width, height: width)
     }
 }
+
+// MARK: - PopUpDelegate
 
 extension PokedexController: PopUpDelegate {
     
@@ -206,6 +211,8 @@ extension PokedexController: PopUpDelegate {
         }
     }
 }
+
+// MARK: - SearchBarDelegate
 
 extension PokedexController: UISearchBarDelegate {
     

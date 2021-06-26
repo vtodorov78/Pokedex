@@ -48,6 +48,13 @@ class PokedexCell: UICollectionViewCell {
     
     // MARK: - Helper Functions
     
+    func configureCell(with pokemon: Pokemon) {
+        if let imgUrl = pokemon.imageUrl {
+            imageView.downloaded(from: imgUrl)
+        }
+        nameLabel.text = pokemon.name?.capitalized
+    }
+    
     func configureViewComponents() {
 
         self.layer.cornerRadius = 10

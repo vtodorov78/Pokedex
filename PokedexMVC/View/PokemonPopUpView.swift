@@ -15,6 +15,9 @@ class PokemonPopUpView: UIView {
 
     // MARK: - Properties
     
+    var pokemon: Pokemon?
+    var delegate: PopUpDelegate?
+    
     let imageView: CustomUIImageView = {
         let imageView = CustomUIImageView()
         imageView.contentMode = .scaleAspectFit
@@ -38,7 +41,6 @@ class PokemonPopUpView: UIView {
     let typeLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
-        label.text = "POKEMON"
         label.textAlignment = .center
         label.textColor = .mainPink()
         return label
@@ -47,7 +49,6 @@ class PokemonPopUpView: UIView {
     let heightLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
-        label.text = "POKEMON"
         label.textAlignment = .center
         label.textColor = .mainPink()
         return label
@@ -56,7 +57,6 @@ class PokemonPopUpView: UIView {
     let weightLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
-        label.text = "POKEMON"
         label.textAlignment = .center
         label.textColor = .mainPink()
         return label
@@ -76,8 +76,6 @@ class PokemonPopUpView: UIView {
     }()
 
     
-    var delegate: PopUpDelegate?
-    
     // MARK: - Init
     
     override init(frame: CGRect) {
@@ -91,6 +89,17 @@ class PokemonPopUpView: UIView {
     }
     
     // MARK: - Helper functions
+    
+    func configurePopUp(with pokemon: Pokemon) {
+        nameLabel.text = pokemon.name?.capitalized
+        
+        if let imgUrl = pokemon.imageUrl {
+            imageView.downloaded(from: imgUrl)
+        }
+        typeLabel.text = "Type: \(pokemon.type?.capitalized ?? "N/A")"
+        heightLabel.text = (String(format: "Height: %d", pokemon.height ?? "NA"))
+        weightLabel.text = (String(format: "Weight: %d", pokemon.weight ?? "NA"))
+    }
     
     func configureViewComponents() {
     
@@ -113,6 +122,7 @@ class PokemonPopUpView: UIView {
         stack.anchor(top: imageView.bottomAnchor, left: leftAnchor, bottom: moreInfoButton.topAnchor, right: rightAnchor, paddingTop: 70, paddingLeft: 0, paddingBottom: 70, paddingRight: 0, width: 0, height: 0)
         
     }
+    
     
     @objc func handleDismissal() {
         delegate?.handleDismissal()
