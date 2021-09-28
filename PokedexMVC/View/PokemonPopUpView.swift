@@ -35,6 +35,7 @@ class PokemonPopUpView: UIView {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
+        label.textColor = .white
         return label
     }()
     
