@@ -31,21 +31,21 @@ class PokemonInfoController: UIViewController {
     
     let typeLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .mainPink()
+        label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
     
     let heightLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .mainPink()
+        label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
     
     let weightLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .mainPink()
+        label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
@@ -57,21 +57,21 @@ class PokemonInfoController: UIViewController {
     
     let defenceLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .mainPink()
+        label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
     
     let idLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .mainPink()
+        label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
     
     let baseAttackLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .mainPink()
+        label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
@@ -138,11 +138,36 @@ class PokemonInfoController: UIViewController {
             imageView.downloaded(from: imgUrl)
         }
         typeLabel.text = "Type: \(pokemon?.type?.capitalized ?? "NA")"
+        let attributedType = NSMutableAttributedString(string: typeLabel.text ?? "N/A")
+        attributedType.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 5))
+        typeLabel.attributedText = attributedType
+        
         heightLabel.text = String(format: "Height: %d", pokemon?.height ?? "NA")
+        let attributedHeight = NSMutableAttributedString(string: heightLabel.text ?? "N/A")
+        attributedHeight.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 7))
+        heightLabel.attributedText = attributedHeight
+        
         weightLabel.text = String(format: "Weight: %d", pokemon?.weight ?? "NA")
+        let attributedWeight = NSMutableAttributedString(string: weightLabel.text ?? "N/A")
+        attributedWeight.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 7))
+        weightLabel.attributedText = attributedWeight
+        
         defenceLabel.text = String(format: "Defence: %d", pokemon?.defense ?? "NA")
+        let attributedDefence = NSMutableAttributedString(string: defenceLabel.text ?? "N/A")
+        attributedDefence.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 8))
+        defenceLabel.attributedText = attributedDefence
+        
+        
         idLabel.text = String(format: "ID: %d", pokemon?.id ?? "NA")
+        let attributedId = NSMutableAttributedString(string: idLabel.text ?? "N/A")
+        attributedId.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 3))
+        idLabel.attributedText = attributedId
+        
         baseAttackLabel.text = String(format: "Attack: %d", pokemon?.attack ?? "NA")
+        let attributedAttack = NSMutableAttributedString(string: baseAttackLabel.text ?? "N/A")
+        attributedAttack.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 7))
+        baseAttackLabel.attributedText = attributedAttack
+        
         centerContainerLabel.text = pokemon?.type?.capitalized
     }
 }

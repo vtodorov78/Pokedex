@@ -43,7 +43,7 @@ class PokemonPopUpView: UIView {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment = .center
-        label.textColor = .mainPink()
+        label.textColor = .black
         return label
     }()
     
@@ -51,7 +51,7 @@ class PokemonPopUpView: UIView {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment = .center
-        label.textColor = .mainPink()
+        label.textColor = .black
         return label
     }()
     
@@ -59,7 +59,7 @@ class PokemonPopUpView: UIView {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment = .center
-        label.textColor = .mainPink()
+        label.textColor = .black
         return label
     }()
     
@@ -98,8 +98,19 @@ class PokemonPopUpView: UIView {
             imageView.downloaded(from: imgUrl)
         }
         typeLabel.text = "Type: \(pokemon.type?.capitalized ?? "N/A")"
+        let attributedType = NSMutableAttributedString(string: typeLabel.text ?? "N/A")
+        attributedType.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 5))
+        typeLabel.attributedText = attributedType
+        
         heightLabel.text = (String(format: "Height: %d", pokemon.height ?? "NA"))
+        let attributedHeight = NSMutableAttributedString(string: heightLabel.text ?? "N/A")
+        attributedHeight.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 7))
+        heightLabel.attributedText = attributedHeight
+        
         weightLabel.text = (String(format: "Weight: %d", pokemon.weight ?? "NA"))
+        let attributedWeight = NSMutableAttributedString(string: weightLabel.text ?? "N/A")
+        attributedWeight.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 7))
+        weightLabel.attributedText = attributedWeight
     }
     
     func configureViewComponents() {
