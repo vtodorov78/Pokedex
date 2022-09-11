@@ -132,7 +132,7 @@ class PokedexController: UICollectionViewController {
     
     
     func handleShowPopUp() {
-        showSearchBarButton(shouldShow: false)
+        search(shouldShow: false)
         navigationItem.rightBarButtonItem?.isEnabled = false
         
         view.addSubview(popupView)
@@ -174,15 +174,29 @@ extension PokedexController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if inSearchMode {
-            let filteredPokemon = filteredPokemon[indexPath.item]
-            handleShowPopUp()
-            popupView.configurePopUp(with: filteredPokemon)
-        } else {
-            let pokemon = pokemon[indexPath.item]
-            handleShowPopUp()
-            popupView.configurePopUp(with: pokemon)
+        
+        let poke = inSearchMode ? filteredPokemon[indexPath.row] : pokemon[indexPath.row]
+        
+        var evoIds = [String]()
+        var pokemonEvoArray = [Pokemon]()
+        
+        if let evoChain = poke.evolutionChain {
+            for evo in evoChain {
+                let id = Int(evo.id ?? "")
+                if id! <= 151 {
+                    evoIds.append(evo.id ?? "")
+                }
+            }
+            
+            evoIds.forEach { (id) in
+                pokemonEvoArray.append(pokemon[Int(id)! - 1])
+            }
+            
+            poke.evoArray = pokemonEvoArray
         }
+        
+        handleShowPopUp()
+        popupView.configurePopUp(with: poke)
     }
 }
 
@@ -212,7 +226,7 @@ extension PokedexController: PopUpDelegate {
         }) { (_) in
             self.popupView.removeFromSuperview()
             self.navigationItem.rightBarButtonItem?.isEnabled = true
-            self.showSearchBarButton(shouldShow: true)
+            self.search(shouldShow: true)
         }
     }
 }

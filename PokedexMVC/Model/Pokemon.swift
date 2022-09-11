@@ -19,6 +19,7 @@ class Pokemon: Codable {
     let defense: Int?       
     let type: String?
     let evolutionChain: [EvolutionChain]?
+    var evoArray: [Pokemon]?
 }
 
 class EvolutionChain: Codable {

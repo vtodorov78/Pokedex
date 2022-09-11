@@ -12,8 +12,6 @@ class PokemonInfoController: UIViewController {
     // MARK: - Properties
     
     var pokemon: Pokemon?
-    var pokemonEvoArray = [Pokemon]()
-    var evolutionIds = [Int]()
     
     let imageView: CustomUIImageView = {
         let imageView = CustomUIImageView()
@@ -31,22 +29,22 @@ class PokemonInfoController: UIViewController {
     
     let typeLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.textColor = .systemGray
+        label.font = UIFont.boldSystemFont(ofSize: 16)
         return label
     }()
     
     let heightLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.textColor = .systemGray
+        label.font = UIFont.boldSystemFont(ofSize: 16)
         return label
     }()
     
     let weightLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.textColor = .systemGray
+        label.font = UIFont.boldSystemFont(ofSize: 16)
         return label
     }()
     
@@ -57,22 +55,22 @@ class PokemonInfoController: UIViewController {
     
     let defenceLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.textColor = .systemGray
+        label.font = UIFont.boldSystemFont(ofSize: 16)
         return label
     }()
     
     let idLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.textColor = .systemGray
+        label.font = UIFont.boldSystemFont(ofSize: 16)
         return label
     }()
     
     let baseAttackLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.textColor = .systemGray
+        label.font = UIFont.boldSystemFont(ofSize: 16)
         return label
     }()
     
@@ -95,6 +93,18 @@ class PokemonInfoController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
+    
+    let imageView2: CustomUIImageView = {
+        let imageView = CustomUIImageView()
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
+    let imageView3: CustomUIImageView = {
+        let imageView = CustomUIImageView()
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
    
 
     override func viewDidLoad() {
@@ -111,7 +121,6 @@ class PokemonInfoController: UIViewController {
         
         view.addSubview(imageView)
         imageView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: nil, right: nil, paddingTop: 30, paddingLeft: 10, paddingBottom: 0, paddingRight: 0, width: 120, height: 120)
-    
     
         view.addSubview(descriptionLabel)
         descriptionLabel.anchor(top: view.topAnchor, left: imageView.rightAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 30, paddingLeft: 20, paddingBottom: 0, paddingRight: 10, width: 0, height: 120)
@@ -132,11 +141,28 @@ class PokemonInfoController: UIViewController {
         centerContainerView.anchor(top: nil, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 50)
         centerContainerView.center(inView: view)
         
+        view.addSubview(imageView2)
+        imageView2.anchor(top: nil, left: view.leftAnchor, bottom: view.bottomAnchor, right: nil, paddingTop: 0, paddingLeft: 10, paddingBottom: 200, paddingRight: 0, width: 120, height: 120)
+        
+        view.addSubview(imageView3)
+        imageView3.anchor(top: nil, left: nil, bottom: view.bottomAnchor, right: view.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 200, paddingRight: 10, width: 120, height: 120)
+        
         title = pokemon?.name?.capitalized
         descriptionLabel.text = pokemon?.description
         if let imgUrl = pokemon?.imageUrl {
             imageView.downloaded(from: imgUrl)
         }
+        
+        if let evoArray = pokemon?.evoArray {
+            if evoArray.count > 1 {
+                imageView2.downloaded(from: evoArray[0].imageUrl ?? "")
+                imageView3.downloaded(from: evoArray[1].imageUrl ?? "")
+            } else {
+                imageView2.downloaded(from: evoArray[0].imageUrl ?? "")
+            }
+        }
+        
+        
         typeLabel.text = "Type: \(pokemon?.type?.capitalized ?? "NA")"
         let attributedType = NSMutableAttributedString(string: typeLabel.text ?? "N/A")
         attributedType.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 5))
@@ -168,6 +194,8 @@ class PokemonInfoController: UIViewController {
         attributedAttack.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 7))
         baseAttackLabel.attributedText = attributedAttack
         
-        centerContainerLabel.text = pokemon?.type?.capitalized
+        centerContainerLabel.text = "Evolution Chain:"
+        
+        
     }
 }

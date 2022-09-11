@@ -41,25 +41,25 @@ class PokemonPopUpView: UIView {
     
     let typeLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
+        label.font = UIFont.boldSystemFont(ofSize: 14)
         label.textAlignment = .center
-        label.textColor = .black
+        label.textColor = .systemGray
         return label
     }()
     
     let heightLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
+        label.font = UIFont.boldSystemFont(ofSize: 14)
         label.textAlignment = .center
-        label.textColor = .black
+        label.textColor = .systemGray
         return label
     }()
     
     let weightLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
+        label.font = UIFont.boldSystemFont(ofSize: 14)
         label.textAlignment = .center
-        label.textColor = .black
+        label.textColor = .systemGray
         return label
     }()
     
