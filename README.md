@@ -3,7 +3,8 @@
 This is a Pokedex app written in swift for iOS.
 You can search for and view different pokemons, stats, evolution chain etc.
 
-
+## API 
+Pulling data from https://pokedex-bb36f.firebaseio.com/pokemon.json
 
 ## Demo
 
