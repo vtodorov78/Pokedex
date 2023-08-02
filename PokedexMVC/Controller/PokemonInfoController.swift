@@ -126,6 +126,17 @@ class PokemonInfoController: UIViewController {
         label.textAlignment = .center
         return label
     }()
+    
+    let noEvolutionLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.text = "This Pokemon has no evolutions."
+        label.isHidden = true
+        return label
+    }()
    
 
     override func viewDidLoad() {
@@ -176,6 +187,9 @@ class PokemonInfoController: UIViewController {
         secondEvolutionNameLabel.anchor(top: imageView3.bottomAnchor, left: nil, bottom: nil, right: view.rightAnchor, paddingTop: 15, paddingLeft: 0, paddingBottom: 0, paddingRight: 10, width: 0, height: 0)
         secondEvolutionNameLabel.centerXAnchor.constraint(equalTo: imageView3.centerXAnchor).isActive = true
         
+        view.addSubview(noEvolutionLabel)
+        noEvolutionLabel.anchor(top: centerContainerView.bottomAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 50, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
+        
         
         title = pokemon?.name?.capitalized
         descriptionLabel.text = pokemon?.description
@@ -190,6 +204,13 @@ class PokemonInfoController: UIViewController {
                 
                 firstEvolutionNameLabel.text = evoArray[0].name?.capitalized ?? ""
                 secondEvolutionNameLabel.text = evoArray[1].name?.capitalized ?? ""
+            }
+            else if evoArray.count > 0 {
+                imageView2.downloaded(from: evoArray[0].imageUrl ?? "")
+                firstEvolutionNameLabel.text = evoArray[0].name?.capitalized ?? ""
+            }
+            else {
+                noEvolutionLabel.isHidden = false
             }
         }
         
