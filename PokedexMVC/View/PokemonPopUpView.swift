@@ -34,7 +34,7 @@ class PokemonPopUpView: UIView {
     
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = UIFont.boldSystemFont(ofSize: 16)
         label.textColor = .white
         return label
     }()
@@ -47,7 +47,7 @@ class PokemonPopUpView: UIView {
         return label
     }()
     
-    let heightLabel: UILabel = {
+    let attackLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 14)
         label.textAlignment = .center
@@ -55,7 +55,7 @@ class PokemonPopUpView: UIView {
         return label
     }()
     
-    let weightLabel: UILabel = {
+    let defenceLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 14)
         label.textAlignment = .center
@@ -72,7 +72,7 @@ class PokemonPopUpView: UIView {
     }()
     
     lazy var stack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [typeLabel, heightLabel, weightLabel])
+        let stack = UIStackView(arrangedSubviews: [typeLabel, attackLabel, defenceLabel])
         return stack
     }()
 
@@ -102,20 +102,22 @@ class PokemonPopUpView: UIView {
         attributedType.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 5))
         typeLabel.attributedText = attributedType
         
-        heightLabel.text = (String(format: "Height: %d", pokemon.height ?? "NA"))
-        let attributedHeight = NSMutableAttributedString(string: heightLabel.text ?? "N/A")
+        attackLabel.text = (String(format: "Attack: %d", pokemon.attack ?? "NA"))
+        let attributedHeight = NSMutableAttributedString(string: attackLabel.text ?? "N/A")
         attributedHeight.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 7))
-        heightLabel.attributedText = attributedHeight
+        attackLabel.attributedText = attributedHeight
         
-        weightLabel.text = (String(format: "Weight: %d", pokemon.weight ?? "NA"))
-        let attributedWeight = NSMutableAttributedString(string: weightLabel.text ?? "N/A")
+        defenceLabel.text = (String(format: "Defence: %d", pokemon.defense ?? "NA"))
+        let attributedWeight = NSMutableAttributedString(string: defenceLabel.text ?? "N/A")
         attributedWeight.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 7))
-        weightLabel.attributedText = attributedWeight
+        defenceLabel.attributedText = attributedWeight
     }
     
     func configureViewComponents() {
     
         self.layer.cornerRadius = 10
+        self.layer.borderWidth = 1.5
+        self.layer.borderColor = UIColor.mainPink().cgColor
         self.clipsToBounds = true
         
         addSubview(nameContainerView)
@@ -139,7 +141,6 @@ class PokemonPopUpView: UIView {
     @objc func handleDismissal() {
         delegate?.handleDismissal()
     }
-    
     
 
 }

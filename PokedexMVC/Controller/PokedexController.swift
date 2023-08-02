@@ -130,7 +130,6 @@ class PokedexController: UICollectionViewController {
     }
     
     
-    
     func handleShowPopUp() {
         search(shouldShow: false)
         navigationItem.rightBarButtonItem?.isEnabled = false
