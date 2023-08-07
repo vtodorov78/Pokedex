@@ -8,14 +8,37 @@
 import UIKit
 
 protocol PopUpDelegate {
-    func handleDismissal()
+    func dismissInfoView(withPokemon pokemon: Pokemon?)
 }
 
 class PokemonPopUpView: UIView {
 
     // MARK: - Properties
     
-    var pokemon: Pokemon?
+    var pokemon: Pokemon? {
+        didSet {
+            nameLabel.text = pokemon?.name?.capitalized
+            
+            if let imgUrl = pokemon?.imageUrl {
+                imageView.downloaded(from: imgUrl)
+            }
+            typeLabel.text = "Type: \(pokemon?.type?.capitalized ?? "N/A")"
+            let attributedType = NSMutableAttributedString(string: typeLabel.text ?? "N/A")
+            attributedType.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 5))
+            typeLabel.attributedText = attributedType
+            
+            attackLabel.text = (String(format: "Attack: %d", pokemon?.attack ?? "NA"))
+            let attributedHeight = NSMutableAttributedString(string: attackLabel.text ?? "N/A")
+            attributedHeight.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 7))
+            attackLabel.attributedText = attributedHeight
+            
+            defenceLabel.text = (String(format: "Defence: %d", pokemon?.defense ?? "NA"))
+            let attributedWeight = NSMutableAttributedString(string: defenceLabel.text ?? "N/A")
+            attributedWeight.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 7))
+            defenceLabel.attributedText = attributedWeight
+        }
+    }
+    
     var delegate: PopUpDelegate?
     
     let imageView: CustomUIImageView = {
@@ -63,11 +86,12 @@ class PokemonPopUpView: UIView {
         return label
     }()
     
-    let moreInfoButton: UIButton = {
+    lazy var moreInfoButton: UIButton = {
         let button = UIButton()
         button.setTitle("View More Info", for: .normal)
         button.backgroundColor = .mainPink()
         button.layer.cornerRadius = 10
+        button.addTarget(self, action: #selector(handleViewMoreInfo), for: .touchUpInside)
         return button
     }()
     
@@ -90,28 +114,6 @@ class PokemonPopUpView: UIView {
     }
     
     // MARK: - Helper functions
-    
-    func configurePopUp(with pokemon: Pokemon) {
-        nameLabel.text = pokemon.name?.capitalized
-        
-        if let imgUrl = pokemon.imageUrl {
-            imageView.downloaded(from: imgUrl)
-        }
-        typeLabel.text = "Type: \(pokemon.type?.capitalized ?? "N/A")"
-        let attributedType = NSMutableAttributedString(string: typeLabel.text ?? "N/A")
-        attributedType.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 5))
-        typeLabel.attributedText = attributedType
-        
-        attackLabel.text = (String(format: "Attack: %d", pokemon.attack ?? "NA"))
-        let attributedHeight = NSMutableAttributedString(string: attackLabel.text ?? "N/A")
-        attributedHeight.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 7))
-        attackLabel.attributedText = attributedHeight
-        
-        defenceLabel.text = (String(format: "Defence: %d", pokemon.defense ?? "NA"))
-        let attributedWeight = NSMutableAttributedString(string: defenceLabel.text ?? "N/A")
-        attributedWeight.addAttribute(.foregroundColor, value: UIColor.mainPink(), range: NSRange(location: 0, length: 7))
-        defenceLabel.attributedText = attributedWeight
-    }
     
     func configureViewComponents() {
     
@@ -137,9 +139,9 @@ class PokemonPopUpView: UIView {
         
     }
     
-    
-    @objc func handleDismissal() {
-        delegate?.handleDismissal()
+    @objc func handleViewMoreInfo() {
+        guard let pokemon = self.pokemon else { return }
+        delegate?.dismissInfoView(withPokemon: pokemon)
     }
     
 

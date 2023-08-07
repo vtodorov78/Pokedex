@@ -7,11 +7,27 @@
 
 import UIKit
 
+protocol PokedexCellDelegate {
+    func presentPopUpView(withPokemon pokemon: Pokemon)
+}
+
 class PokedexCell: UICollectionViewCell {
     
     // MARK: - Properties
     
     static let reuseIdentifier = "PokedexCell"
+    
+    var delegate: PokedexCellDelegate?
+    
+    var pokemon: Pokemon? {
+        didSet {
+            if let imgUrl = pokemon?.imageUrl {
+                imageView.downloaded(from: imgUrl)
+            }
+            nameLabel.text = pokemon?.name?.capitalized
+        }
+    }
+
     
     let imageView: CustomUIImageView = {
         let imageView = CustomUIImageView()
@@ -46,14 +62,18 @@ class PokedexCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Helper Functions
+    // MARK: - Selectors
     
-    func configureCell(with pokemon: Pokemon) {
-        if let imgUrl = pokemon.imageUrl {
-            imageView.downloaded(from: imgUrl)
+    @objc func handleLongPress(sender: UILongPressGestureRecognizer) {
+        if sender.state == .began {
+            guard let pokemon = self.pokemon else {
+                print("PEZA E BRAT")
+                return }
+            delegate?.presentPopUpView(withPokemon: pokemon)
         }
-        nameLabel.text = pokemon.name?.capitalized
     }
+    
+    // MARK: - Helper Functions
     
     func configureViewComponents() {
 
@@ -67,5 +87,8 @@ class PokedexCell: UICollectionViewCell {
         
         addSubview(nameContainerView)
         nameContainerView.anchor(top: nil, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 32)
+        
+        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
+        self.addGestureRecognizer(longPressGestureRecognizer)
     }
 }

@@ -91,7 +91,7 @@ class PokemonInfoController: UIViewController {
         let label = UILabel()
         label.textColor = .white
         label.font = UIFont.boldSystemFont(ofSize: 16)
-        label.text = "Evolution Chain:"
+        label.text = "Evolution Chain"
         return label
     }()
     
@@ -198,6 +198,7 @@ class PokemonInfoController: UIViewController {
         }
         
         if let evoArray = pokemon?.evoArray {
+            
             if evoArray.count > 1 {
                 imageView2.downloaded(from: evoArray[0].imageUrl ?? "")
                 imageView3.downloaded(from: evoArray[1].imageUrl ?? "")
@@ -209,9 +210,9 @@ class PokemonInfoController: UIViewController {
                 imageView2.downloaded(from: evoArray[0].imageUrl ?? "")
                 firstEvolutionNameLabel.text = evoArray[0].name?.capitalized ?? ""
             }
-            else {
-                noEvolutionLabel.isHidden = false
-            }
+            
+        } else {
+            noEvolutionLabel.isHidden = false
         }
         
         

@@ -22,7 +22,6 @@ class PokedexController: UICollectionViewController {
         let view = PokemonPopUpView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.layer.cornerRadius = 5
-        view.delegate = self
         return view
     }()
     
@@ -40,9 +39,7 @@ class PokedexController: UICollectionViewController {
         
         configureViewComponents()
         fetchPokemon()
-        
     }
-    
     
     // MARK: - Selectors
     
@@ -51,22 +48,9 @@ class PokedexController: UICollectionViewController {
         searchBar.becomeFirstResponder()
     }
     
-    @objc func moreInfoButtonClicked() {
-        let infoVC = PokemonInfoController()
-        handleDismissal()
-        
-        if inSearchMode {
-            if let indexPath = collectionView?.indexPathsForSelectedItems?.first {
-                infoVC.pokemon = filteredPokemon[indexPath.row]
-            }
-        } else {
-            if let indexPath = collectionView?.indexPathsForSelectedItems?.first {
-                infoVC.pokemon = pokemon[indexPath.row]
-            }
-        }
-        navigationController?.pushViewController(infoVC, animated: true)
+    @objc func handleDismissal() {
+        dismissInfoView(pokemon: nil)
     }
-    
     // MARK: - API
     
     func fetchPokemon() {
@@ -113,6 +97,29 @@ class PokedexController: UICollectionViewController {
         visualEffectView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleDismissal)))
     }
     
+    func dismissInfoView(pokemon: Pokemon?) {
+         UIView.animate(withDuration: 0.5, animations: {
+             self.visualEffectView.alpha = 0
+             self.popupView.alpha = 0
+             self.popupView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+         }) { (_) in
+             self.popupView.removeFromSuperview()
+             self.navigationItem.rightBarButtonItem?.isEnabled = true
+             self.search(shouldShow: true)
+         }
+        
+        guard let pokemon = pokemon else { return }
+        getPokemonEvolutions(poke: pokemon)
+        showPokemonInfoController(withPokemon: pokemon)
+     }
+    
+    func showPokemonInfoController(withPokemon pokemon: Pokemon) {
+        search(shouldShow: false)
+        let controller = PokemonInfoController()
+        controller.pokemon = pokemon
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
     
     func showSearchBarButton(shouldShow: Bool) {
         if shouldShow {
@@ -129,24 +136,23 @@ class PokedexController: UICollectionViewController {
         navigationItem.titleView = shouldShow ? searchBar : nil
     }
     
-    
-    func handleShowPopUp() {
-        search(shouldShow: false)
-        navigationItem.rightBarButtonItem?.isEnabled = false
+    func getPokemonEvolutions(poke: Pokemon) {
+        // get evolutions of the selected pokemon
+        var evoIds = [String]()
+        var pokemonEvoArray = [Pokemon]()
         
-        view.addSubview(popupView)
-        popupView.center(inView: view)
-        popupView.heightAnchor.constraint(equalToConstant: view.frame.width + 80).isActive = true
-        popupView.widthAnchor.constraint(equalToConstant: view.frame.width - 64).isActive = true
-        
-        popupView.moreInfoButton.addTarget(self, action: #selector(moreInfoButtonClicked), for: .touchUpInside)
-        
-        popupView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-        popupView.alpha = 0
-        UIView.animate(withDuration: 0.5) {
-            self.visualEffectView.alpha = 1
-            self.popupView.alpha = 1
-            self.popupView.transform = CGAffineTransform.identity
+        if let evoChain = poke.evolutionChain {
+            for evo in evoChain {
+                let id = Int(evo.id ?? "")
+                if id! <= 151 {
+                    evoIds.append(evo.id ?? "")
+                }
+            }
+            evoIds.forEach { (id) in
+                pokemonEvoArray.append(pokemon[Int(id)! - 1])
+            }
+            
+            poke.evoArray = pokemonEvoArray
         }
     }
 }
@@ -161,14 +167,11 @@ extension PokedexController {
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PokedexCell.reuseIdentifier, for: indexPath) as! PokedexCell
+    
+        cell.pokemon = inSearchMode ? filteredPokemon[indexPath.item] : pokemon[indexPath.item]
         
-        if inSearchMode {
-            let filteredPokemon = filteredPokemon[indexPath.item]
-            cell.configureCell(with: filteredPokemon)
-        } else {
-            let pokemon = pokemon[indexPath.item]
-            cell.configureCell(with: pokemon)
-        }
+        cell.delegate = self
+        
         return cell
     }
     
@@ -176,26 +179,9 @@ extension PokedexController {
         
         let poke = inSearchMode ? filteredPokemon[indexPath.row] : pokemon[indexPath.row]
         
-        var evoIds = [String]()
-        var pokemonEvoArray = [Pokemon]()
+        getPokemonEvolutions(poke: poke)
         
-        if let evoChain = poke.evolutionChain {
-            for evo in evoChain {
-                let id = Int(evo.id ?? "")
-                if id! <= 151 {
-                    evoIds.append(evo.id ?? "")
-                }
-            }
-            
-            evoIds.forEach { (id) in
-                pokemonEvoArray.append(pokemon[Int(id)! - 1])
-            }
-            
-            poke.evoArray = pokemonEvoArray
-        }
-        
-        handleShowPopUp()
-        popupView.configurePopUp(with: poke)
+        showPokemonInfoController(withPokemon: poke)
     }
 }
 
@@ -213,20 +199,36 @@ extension PokedexController: UICollectionViewDelegateFlowLayout {
     }
 }
 
+// MARK: - PokedexCellDelegate
+
+extension PokedexController: PokedexCellDelegate {
+    func presentPopUpView(withPokemon pokemon: Pokemon) {
+        search(shouldShow: false)
+        navigationItem.rightBarButtonItem?.isEnabled = false
+        
+        view.addSubview(popupView)
+        popupView.configureViewComponents()
+        popupView.delegate = self
+        popupView.pokemon = pokemon
+        popupView.center(inView: view)
+        popupView.heightAnchor.constraint(equalToConstant: view.frame.width + 80).isActive = true
+        popupView.widthAnchor.constraint(equalToConstant: view.frame.width - 64).isActive = true
+        popupView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+        popupView.alpha = 0
+        UIView.animate(withDuration: 0.5) {
+            self.visualEffectView.alpha = 1
+            self.popupView.alpha = 1
+            self.popupView.transform = CGAffineTransform.identity
+        }
+    }
+}
+
 // MARK: - PopUpDelegate
 
 extension PokedexController: PopUpDelegate {
     
-   @objc func handleDismissal() {
-        UIView.animate(withDuration: 0.5, animations: {
-            self.visualEffectView.alpha = 0
-            self.popupView.alpha = 0
-            self.popupView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-        }) { (_) in
-            self.popupView.removeFromSuperview()
-            self.navigationItem.rightBarButtonItem?.isEnabled = true
-            self.search(shouldShow: true)
-        }
+    func dismissInfoView(withPokemon pokemon: Pokemon?) {
+        dismissInfoView(pokemon: pokemon)
     }
 }
 
