@@ -16,6 +16,8 @@ class PokedexController: UICollectionViewController {
     var filteredPokemon = [Pokemon]()
     var inSearchMode = false
     
+    var goingForwards = true
+    
     let searchBar = UISearchBar()
     
     lazy var popupView: PokemonPopUpView = {
@@ -41,6 +43,14 @@ class PokedexController: UICollectionViewController {
         fetchPokemon()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if searchBar.searchTextField.text != "" {
+            showSearchBar()
+        }
+    }
+    
     // MARK: - Selectors
     
     @objc func showSearchBar() {
@@ -51,6 +61,7 @@ class PokedexController: UICollectionViewController {
     @objc func handleDismissal() {
         dismissInfoView(pokemon: nil)
     }
+    
     // MARK: - API
     
     func fetchPokemon() {
@@ -81,6 +92,7 @@ class PokedexController: UICollectionViewController {
         navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
         
         navigationItem.title = "Pokedex"
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "Back", style: .done, target: self, action: nil)
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(showSearchBar))
         showSearchBarButton(shouldShow: true)
         

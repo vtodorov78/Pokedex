@@ -146,7 +146,6 @@ class PokemonInfoController: UIViewController {
         configureViewComponents()
     }
     
-    
     // MARK: - Helper Functions
     
     func configureViewComponents() {
