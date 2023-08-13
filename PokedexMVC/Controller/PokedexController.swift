@@ -99,6 +99,8 @@ class PokedexController: UICollectionViewController {
         collectionView.register(PokedexCell.self, forCellWithReuseIdentifier: PokedexCell.reuseIdentifier)
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.prefetchDataSource = self
+        collectionView.isPrefetchingEnabled = true
         
         view.addSubview(visualEffectView)
         visualEffectView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
@@ -117,7 +119,9 @@ class PokedexController: UICollectionViewController {
          }) { (_) in
              self.popupView.removeFromSuperview()
              self.navigationItem.rightBarButtonItem?.isEnabled = true
-             self.search(shouldShow: true)
+             if self.searchBar.searchTextField.text != "" {
+                 self.showSearchBar()
+             }
          }
         
         guard let pokemon = pokemon else { return }
@@ -189,11 +193,31 @@ extension PokedexController {
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        let poke = inSearchMode ? filteredPokemon[indexPath.row] : pokemon[indexPath.row]
+        let poke = inSearchMode ? filteredPokemon[indexPath.item] : pokemon[indexPath.item]
         
         getPokemonEvolutions(poke: poke)
         
         showPokemonInfoController(withPokemon: poke)
+    }
+}
+
+// MARK: - UICollectionViewDatasourcePrefetching
+
+extension PokedexController: UICollectionViewDataSourcePrefetching {
+
+    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+
+        for indexPath in indexPaths {
+            let poke = inSearchMode ? filteredPokemon[indexPath.item] : pokemon[indexPath.item]
+            
+            if let imageUrl = poke.imageUrl {
+                
+                if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PokedexCell.reuseIdentifier, for: indexPath) as? PokedexCell {
+            
+                    cell.imageView.downloaded(from: imageUrl)
+                }
+            }
+        }
     }
 }
 
@@ -202,7 +226,7 @@ extension PokedexController {
 extension PokedexController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 32, left: 8, bottom: 8, right: 8)
+        return UIEdgeInsets(top: 30, left: 8, bottom: 8, right: 8)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

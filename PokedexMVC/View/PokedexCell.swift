@@ -66,9 +66,7 @@ class PokedexCell: UICollectionViewCell {
     
     @objc func handleLongPress(sender: UILongPressGestureRecognizer) {
         if sender.state == .began {
-            guard let pokemon = self.pokemon else {
-                print("PEZA E BRAT")
-                return }
+            guard let pokemon = self.pokemon else { return }
             delegate?.presentPopUpView(withPokemon: pokemon)
         }
     }
